@@ -1,0 +1,2 @@
+# Comunicados
+Geração de Comunicados
