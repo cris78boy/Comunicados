@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Comunicado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .chat-container, .comunicado {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .robot {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        #userInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .newlife-logo {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="robot">🤖</div>
+            <div id="conversation">
+                <div class="message">Olá! Vou ajudar você a criar um comunicado. Vamos começar!</div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Digite sua resposta aqui" style="display: none">
+                <button id="sendBtn" style="display: none" onclick="processAnswer()">Enviar</button>
+            </div>
+            <button id="startBtn" onclick="startQuestionnaire()">Criar Comunicado</button>
+        </div>
+        <div id="comunicadoContainer"></div>
+    </div>
+
+    <script>
+        const questions = [
+            "Qual o nome do condomínio?",
+            "Qual torre?",
+            "Qual a data do comunicado?",
+            "Qual o assunto do comunicado?",
+            "Qual o texto do comunicado?"
+        ];
+
+        let currentQuestion = 0;
+        const answers = {};
+
+        function startQuestionnaire() {
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('userInput').style.display = 'block';
+            document.getElementById('sendBtn').style.display = 'block';
+            askQuestion();
+        }
+
+        function askQuestion() {
+            const conversation = document.getElementById('conversation');
+            conversation.innerHTML += `<div class="message">${questions[currentQuestion]}</div>`;
+            document.getElementById('userInput').value = '';
+            document.getElementById('userInput').focus();
+        }
+
+        function processAnswer() {
+            const input = document.getElementById('userInput');
+            const answer = input.value.trim();
+            if (answer) {
+                answers[questions[currentQuestion]] = answer;
+                const conversation = document.getElementById('conversation');
+                conversation.innerHTML += `<div class="message" style="background: #d4edda">${answer}</div>`;
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+                    askQuestion();
+                } else {
+                    generateComunicado();
+                }
+            }
+        }
+
+        function generateComunicado() {
+            document.getElementById('userInput').style.display = 'none';
+            document.getElementById('sendBtn').style.display = 'none';
+            
+            const comunicadoHTML = `
+                <div class="comunicado" id="comunicadoContent">
+                    <div class="newlife-logo">
+                        🌟 NewLife
+                    </div>
+                    <h2 style="text-align: center; margin-bottom: 20px;">${answers[questions[0]]}</h2>
+                    <p><strong>Torre:</strong> ${answers[questions[1]]}</p>
+                    <p><strong>Data:</strong> ${answers[questions[2]]}</p>
+                    <h3>${answers[questions[3]]}</h3>
+                    <p style="white-space: pre-line;">${answers[questions[4]]}</p>
+                    <div style="margin-top: 30px; text-align: center;">
+                        <p>Atenciosamente,</p>
+                        <p>Administração</p>
+                    </div>
+                    <div class="buttons">
+                        <button onclick="copyToClipboard()">Copiar Comunicado</button>
+                        <button onclick="editComunicado()">Editar</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('comunicadoContainer').innerHTML = comunicadoHTML;
+        }
+
+        function copyToClipboard() {
+            const comunicadoText = document.getElementById('comunicadoContent').innerText;
+            navigator.clipboard.writeText(comunicadoText).then(() => {
+                alert("Comunicado copiado!");
+            }).catch(err => {
+                console.error("Erro ao copiar: ", err);
+            });
+        }
+
+        function editComunicado() {
+            currentQuestion = 0;
+            document.getElementById('comunicadoContainer').innerHTML = '';
+            document.getElementById('conversation').innerHTML = '<div class="message">Vamos editar seu comunicado! Digite as novas respostas.</div>';
+            document.getElementById('userInput').style.display = 'block';
+            document.getElementById('sendBtn').style.display = 'block';
+            askQuestion();
+        }
+    </script>
+</body>
+</html>
